@@ -1,6 +1,6 @@
 React
 Rebase firestore realtime db
-Material ui
+Material ui- npm install @material-ui/core
 React router
 React context api
 Redux
