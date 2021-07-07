@@ -6,8 +6,12 @@ import { AttachFile, MoreVert, SearchOutlined } from "@material-ui/icons";
 import InsertEmoticonIcon from "@material-ui/icons/InsertEmoticon";
 import MicIcon from "@material-ui/icons/Mic";
 
+import firebase from "firebase";
 import db from "../../firebase.config";
+import { useStateValue } from "../../StateProvider";
+
 import "./Chat.css";
+import { id } from "prelude-ls";
 
 export default function Chat() {
   const [seed, setSeed] = useState("");
@@ -15,6 +19,7 @@ export default function Chat() {
   const [roomName, setRoomName] = useState("");
   const [messages, setMessages] = useState([]);
   const { roomId } = useParams();
+  const [{ user }, dispatch] = useStateValue();
 
   useEffect(() => {
     setSeed(Math.floor(Math.random() * 5000));
@@ -39,6 +44,12 @@ export default function Chat() {
   const sendMessage = (e) => {
     e.preventDefault();
     console.log("You typed", input);
+
+    db.collection("rooms").doc(roomId).collection("messages").add({
+      message: input,
+      name: user.displayName,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    });
     setInput("");
   };
 
@@ -50,7 +61,12 @@ export default function Chat() {
         />
         <div className="chat__headerInfo">
           <h3>{roomName}</h3>
-          <p>Last seen at... </p>
+          <p>
+            Last seen{" "}
+            {new Date(
+              messages[messages.length - 1]?.timestamp?.toDate()
+            ).toUTCString()}
+          </p>
         </div>
         <div className="chat__headerRight">
           <IconButton>
@@ -66,7 +82,12 @@ export default function Chat() {
       </div>
       <div className="chat__body">
         {messages.map((message) => (
-          <p className={`chat__message ${true && "chat__reciever"}`}>
+          <p
+            key={message.id}
+            className={`chat__message ${
+              message.name === user.displayName && "chat__reciever"
+            }`}
+          >
             <span className="chat__name">{message.name}</span>
             {message.message}
             <span className="chat__timestamp">
