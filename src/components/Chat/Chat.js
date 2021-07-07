@@ -11,7 +11,6 @@ import db from "../../firebase.config";
 import { useStateValue } from "../../StateProvider";
 
 import "./Chat.css";
-import { id } from "prelude-ls";
 
 export default function Chat() {
   const [seed, setSeed] = useState("");
@@ -19,7 +18,7 @@ export default function Chat() {
   const [roomName, setRoomName] = useState("");
   const [messages, setMessages] = useState([]);
   const { roomId } = useParams();
-  const [{ user }, dispatch] = useStateValue();
+  const [{ user }] = useStateValue();
 
   useEffect(() => {
     setSeed(Math.floor(Math.random() * 5000));
